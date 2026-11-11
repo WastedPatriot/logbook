@@ -195,10 +195,22 @@ def validate(meta: dict, folder: Path) -> dict:
 
 
 def safe_href(url: str) -> bool:
-    if url.startswith(("#", "/", "./", "../")):
+    """Relative links, plus http, https, and mailto.
+
+    Protocol-relative URLs (``//host``) are not local paths. Browsers also
+    treat a backslash as a slash often enough that ``/\\host`` is the same
+    trick. Anything else with a scheme, including ``javascript:`` and
+    ``data:``, is left as text.
+    """
+    candidate = url.strip()
+    if not candidate or re.search(r"[\s\x00-\x1f]", candidate):
+        return False
+    normalised = candidate.replace("\\", "/")
+    if normalised.startswith("//"):
+        return False
+    if candidate.startswith("#") or normalised.startswith(("./", "../", "/")):
         return True
-    lowered = url.lower()
-    return lowered.startswith(("https://", "http://", "mailto:"))
+    return candidate.lower().startswith(("https://", "http://", "mailto:"))
 
 
 def format_plain(raw: str) -> str:
@@ -728,11 +740,25 @@ def index_payload(boxes: list[Box]) -> dict:
     }
 
 
-def resolve_out(raw: str) -> Path:
-    out = (ROOT / raw).resolve()
+# write_site() deletes its output first. These directories are the sources.
+PROTECTED_DIRS = ("boxes", "templates", "scripts", ".github")
+
+
+def assert_output_dir(out: Path) -> Path:
+    out = out.resolve()
     if out == ROOT or ROOT not in out.parents:
         raise BuildError(f"refusing to write to {out}")
+    for name in PROTECTED_DIRS:
+        protected = (ROOT / name).resolve()
+        inside = protected in out.parents or out == protected
+        contains = out in protected.parents
+        if inside or contains:
+            raise BuildError(f"refusing to write to {out}")
     return out
+
+
+def resolve_out(raw: str) -> Path:
+    return assert_output_dir(ROOT / raw)
 
 
 def copy_assets(out: Path) -> None:
@@ -745,6 +771,7 @@ def copy_assets(out: Path) -> None:
 
 
 def write_site(boxes: list[Box], out: Path) -> None:
+    out = assert_output_dir(out)
     if out.exists():
         shutil.rmtree(out)
     out.mkdir(parents=True)
@@ -778,7 +805,43 @@ def self_test() -> None:
     assert "not **bold**" in html_out
     assert outline == [("hello", "Hello")]
     assert 'href="https://example.com"' in html_out
-    assert safe_href("javascript:alert(1)") is False
+    allowed_hrefs = (
+        "https://example.com",
+        "http://example.com",
+        "HTTP://example.com",
+        "mailto:log@example.com",
+        "/boxes/lame/",
+        "#recon",
+        "./notes",
+        "../index.html",
+    )
+    refused_hrefs = (
+        "//evil.example",
+        "///evil.example",
+        "/\\evil.example",
+        "\\\\evil.example",
+        "javascript:alert(1)",
+        "JavaScript:alert(1)",
+        "data:text/html,hi",
+        "vbscript:msgbox(1)",
+        "file:///etc/passwd",
+        " //evil.example",
+        "java\nscript:alert(1)",
+    )
+    for href in allowed_hrefs:
+        if not safe_href(href):
+            raise SystemExit(f"safe_href rejected {href!r}")
+    for href in refused_hrefs:
+        if safe_href(href):
+            raise SystemExit(f"safe_href accepted {href!r}")
+    linked, _ = render_markdown(
+        "[ok](https://example.com) [nope](//evil.example) "
+        "[js](javascript:alert(1)) [data](data:text/html,hi)\n"
+    )
+    assert 'href="https://example.com"' in linked
+    for scheme in ('href="//', 'href="javascript:', 'href="data:', 'href="JavaScript:'):
+        if scheme in linked:
+            raise SystemExit(f"rendered a link with {scheme}")
 
     meta, body = parse_frontmatter(
         "---\nname: Lame\nretired: true\ntechniques:\n  - smb\nsummary: Hi\n---\n\n## Recon\n",
@@ -808,6 +871,60 @@ def self_test() -> None:
 
     if stardate(date(2026, 11, 11)) != "2026.315":
         raise SystemExit(f"stardate drifted: {stardate(date(2026, 11, 11))}")
+
+    expected_out = {
+        "site": ROOT / "site",
+        "site/preview": ROOT / "site" / "preview",
+        "boxes/../site": ROOT / "site",
+    }
+    for raw, expected in expected_out.items():
+        resolved = resolve_out(raw)
+        if resolved != expected.resolve():
+            raise SystemExit(f"{raw} resolved to {resolved}, wanted {expected}")
+    refused_out = (
+        ".",
+        "..",
+        "/",
+        "/tmp/logbook-outside",
+        "boxes",
+        "boxes/lame",
+        "templates",
+        "templates/writeup.md",
+        "scripts",
+        "scripts/build.py",
+        ".github",
+        ".github/workflows",
+    )
+    for raw in refused_out:
+        try:
+            resolve_out(raw)
+        except BuildError as exc:
+            if "refusing" not in str(exc):
+                raise SystemExit(f"odd refusal for {raw}: {exc}") from exc
+        else:
+            raise SystemExit(f"accepted unsafe --out {raw}")
+    link = ROOT / "site-link-test"
+    if link.is_symlink() or link.exists():
+        link.unlink()
+    link.symlink_to(ROOT / "boxes", target_is_directory=True)
+    try:
+        try:
+            resolve_out("site-link-test")
+        except BuildError:
+            pass
+        else:
+            raise SystemExit("symlink to boxes/ was accepted")
+    finally:
+        link.unlink()
+    try:
+        write_site([], ROOT / "boxes")
+    except BuildError:
+        pass
+    else:
+        raise SystemExit("write_site accepted boxes/")
+    if not (ROOT / "boxes" / "lame" / "writeup.md").is_file():
+        raise SystemExit("write_site deleted a source note")
+
     print("self-test ok")
 
 
