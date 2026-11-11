@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>logbook</title>
+<meta name="description" content="Methodology notes for retired Hack The Box machines.">
+<meta name="theme-color" content="#e9e2d2">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<div class="wrap">
+<header class="mast">
+  <p class="brand"><a href="index.html">logbook</a></p>
+  <p class="brand-side">Retired boxes only</p>
+</header>
+<main id="content">
+<div class="intro">
+  <h1>Notes on machines that are already retired.</h1>
+  <p>Recon, foothold, privilege, lesson. Kept for CPTS study. Live boxes do not get a page.</p>
+</div>
+<form class="search" role="search" action="index.html">
+  <label for="q">Search</label>
+  <input id="q" name="q" type="search" placeholder="Name, system, technique" autocomplete="off">
+</form>
+<p class="hint" id="search-hint">Tags combine. Every selected one has to match. <kbd>/</kbd> focuses search.</p>
+<noscript><p class="noscript">Tag search needs JavaScript. The write-ups themselves are ordinary pages.</p></noscript>
+<div class="filter-block"><div class="filter-row"><span class="filter-label">System</span><button type="button" class="chip" data-filter="linux" aria-pressed="false">Linux<span class="n">1</span></button><button type="button" class="chip" data-filter="windows" aria-pressed="false">Windows<span class="n">2</span></button></div><div class="filter-row"><span class="filter-label">Difficulty</span><button type="button" class="chip" data-filter="easy" aria-pressed="false">Easy<span class="n">3</span></button></div><div class="filter-row"><span class="filter-label">Technique</span><button type="button" class="chip" data-filter="active-directory" aria-pressed="false">active-directory<span class="n">1</span></button><button type="button" class="chip" data-filter="enumeration" aria-pressed="false">enumeration<span class="n">3</span></button><button type="button" class="chip" data-filter="ftp" aria-pressed="false">ftp<span class="n">1</span></button><button type="button" class="chip" data-filter="gpp" aria-pressed="false">gpp<span class="n">1</span></button><button type="button" class="chip" data-filter="kerberos" aria-pressed="false">kerberos<span class="n">1</span></button><button type="button" class="chip" data-filter="patch-level" aria-pressed="false">patch-level<span class="n">1</span></button><button type="button" class="chip" data-filter="service-version" aria-pressed="false">service-version<span class="n">1</span></button><button type="button" class="chip" data-filter="smb" aria-pressed="false">smb<span class="n">3</span></button></div></div>
+<p class="count" id="count" aria-live="polite">3 retired boxes</p>
+<ul class="cards">
+<li class="card" data-tags="linux,easy,enumeration,service-version,smb,ftp" data-hay="lame linux easy the first machine on the platform, long retired. several old services answer at once. the work is telling a real door from a banner. enumeration service-version smb ftp example">
+  <p class="card-kicker">Example note</p>
+  <h2><a href="boxes/lame/">Lame</a></h2>
+  <p class="meta"><span>Linux</span> <span aria-hidden="true">·</span> <span class="diff diff-easy">Easy</span> <span aria-hidden="true">·</span> <span>Released 14 Mar 2017</span> <span aria-hidden="true">·</span> <span>Retired 26 May 2017</span></p>
+  <p class="summary">The first machine on the platform, long retired. Several old services answer at once. The work is telling a real door from a banner.</p>
+  <div class="card-tags"><button type="button" class="chip" data-filter="enumeration" aria-pressed="false">enumeration</button><button type="button" class="chip" data-filter="service-version" aria-pressed="false">service-version</button><button type="button" class="chip" data-filter="smb" aria-pressed="false">smb</button><button type="button" class="chip" data-filter="ftp" aria-pressed="false">ftp</button></div>
+</li>
+<li class="card" data-tags="windows,easy,enumeration,smb,patch-level" data-hay="legacy windows easy a retired windows xp host with almost no surface. the patch level is the machine. enumeration smb patch-level example">
+  <p class="card-kicker">Example note</p>
+  <h2><a href="boxes/legacy/">Legacy</a></h2>
+  <p class="meta"><span>Windows</span> <span aria-hidden="true">·</span> <span class="diff diff-easy">Easy</span> <span aria-hidden="true">·</span> <span>Released 15 Mar 2017</span></p>
+  <p class="summary">A retired Windows XP host with almost no surface. The patch level is the machine.</p>
+  <div class="card-tags"><button type="button" class="chip" data-filter="enumeration" aria-pressed="false">enumeration</button><button type="button" class="chip" data-filter="smb" aria-pressed="false">smb</button><button type="button" class="chip" data-filter="patch-level" aria-pressed="false">patch-level</button></div>
+</li>
+<li class="card" data-tags="windows,easy,enumeration,smb,gpp,kerberos,active-directory" data-hay="active windows easy a retired domain controller. anonymous access to a replicated share, a leftover preference password, then an administrator who should not have been a service. enumeration smb gpp kerberos active-directory example">
+  <p class="card-kicker">Example note</p>
+  <h2><a href="boxes/active/">Active</a></h2>
+  <p class="meta"><span>Windows</span> <span aria-hidden="true">·</span> <span class="diff diff-easy">Easy</span> <span aria-hidden="true">·</span> <span>Released 28 Jul 2018</span> <span aria-hidden="true">·</span> <span>Retired 4 May 2024</span></p>
+  <p class="summary">A retired domain controller. Anonymous access to a replicated share, a leftover preference password, then an administrator who should not have been a service.</p>
+  <div class="card-tags"><button type="button" class="chip" data-filter="enumeration" aria-pressed="false">enumeration</button><button type="button" class="chip" data-filter="smb" aria-pressed="false">smb</button><button type="button" class="chip" data-filter="gpp" aria-pressed="false">gpp</button><button type="button" class="chip" data-filter="kerberos" aria-pressed="false">kerberos</button><button type="button" class="chip" data-filter="active-directory" aria-pressed="false">active-directory</button></div>
+</li>
+</ul>
+<div id="empty" class="empty" hidden role="status">
+  <p class="empty-title">Nothing under that heading.</p>
+  <p>Either the tag is wrong, or you went looking for a live box. Those do not get a page.</p>
+</div>
+</main>
+<footer class="site-foot">
+  <p>Retired boxes only. No live spoilers. MIT.</p>
+  <details class="captains-log">
+    <summary>Captain's log</summary>
+    <p>Stardate <time id="stardate">----.---</time>. Nothing on this shelf is still live. End of log.</p>
+  </details>
+</footer>
+</div>
+<script src="assets/site.js"></script>
+</body>
+</html>

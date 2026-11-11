@@ -1,0 +1,59 @@
+{
+  "rule": "retired boxes only",
+  "boxes": [
+    {
+      "name": "Lame",
+      "slug": "lame",
+      "os": "Linux",
+      "difficulty": "Easy",
+      "released": "2017-03-14",
+      "retired_on": "2017-05-26",
+      "updated": "2026-11-11",
+      "example": true,
+      "techniques": [
+        "enumeration",
+        "service-version",
+        "smb",
+        "ftp"
+      ],
+      "summary": "The first machine on the platform, long retired. Several old services answer at once. The work is telling a real door from a banner.",
+      "href": "boxes/lame/"
+    },
+    {
+      "name": "Legacy",
+      "slug": "legacy",
+      "os": "Windows",
+      "difficulty": "Easy",
+      "released": "2017-03-15",
+      "retired_on": null,
+      "updated": "2026-11-11",
+      "example": true,
+      "techniques": [
+        "enumeration",
+        "smb",
+        "patch-level"
+      ],
+      "summary": "A retired Windows XP host with almost no surface. The patch level is the machine.",
+      "href": "boxes/legacy/"
+    },
+    {
+      "name": "Active",
+      "slug": "active",
+      "os": "Windows",
+      "difficulty": "Easy",
+      "released": "2018-07-28",
+      "retired_on": "2024-05-04",
+      "updated": "2026-11-11",
+      "example": true,
+      "techniques": [
+        "enumeration",
+        "smb",
+        "gpp",
+        "kerberos",
+        "active-directory"
+      ],
+      "summary": "A retired domain controller. Anonymous access to a replicated share, a leftover preference password, then an administrator who should not have been a service.",
+      "href": "boxes/active/"
+    }
+  ]
+}

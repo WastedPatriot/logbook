@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Legacy — logbook</title>
+<meta name="description" content="A retired Windows XP host with almost no surface. The patch level is the machine.">
+<meta name="theme-color" content="#e9e2d2">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<div class="wrap">
+<header class="mast">
+  <p class="brand"><a href="../../index.html">logbook</a></p>
+  <p class="brand-side"><a href="../../index.html">Index</a> · retired only</p>
+</header>
+<main id="content">
+<article class="writeup">
+  <p class="eyebrow">Example methodology note</p>
+  <h1>Legacy</h1>
+  <p class="meta"><span>Windows</span> <span aria-hidden="true">·</span> <span class="diff diff-easy">Easy</span> <span aria-hidden="true">·</span> <span>Released 15 Mar 2017</span></p>
+  <ul class="techs"><li><a href="../../index.html?tag=enumeration">enumeration</a></li><li><a href="../../index.html?tag=smb">smb</a></li><li><a href="../../index.html?tag=patch-level">patch-level</a></li></ul>
+  <p class="lede">A retired Windows XP host with almost no surface. The patch level is the machine.</p>
+  <nav class="contents" aria-label="Contents"><ol><li><a href="#recon">Recon</a></li><li><a href="#foothold">Foothold</a></li><li><a href="#privilege-escalation">Privilege escalation</a></li><li><a href="#lessons">Lessons</a></li></ol></nav>
+  <blockquote>
+<p><strong>Example methodology note.</strong> A study sketch of a long-retired machine, written for this shelf. It is original, it is not copied from a walkthrough, and it is not a reproduction guide. The class of issue and the impact are named. The bytes that would carry an attack out are not.</p>
+</blockquote>
+<h2 id="recon">Recon</h2>
+<p>There is very little to enumerate, and that is the enumeration. The ports that answer are the old Windows file-sharing set: the endpoint mapper, NetBIOS, and SMB. No site, no database, no second product sitting there to be interesting.</p>
+<p>The operating system comes back as Windows XP. SMB is the dialect from that era, and message signing is not earning its keep. XP left vendor support in 2014. A reachable, unpatched file-sharing service on an operating system with no vendor is not a subtle situation. Write the operating system down as a finding before you write a CVE down as a plan.</p>
+<p>It is still worth noting the host name, and whether any share can be read without credentials. On this box that work does not open a door. It stops the engagement being &quot;one request, and it was over&quot;, which is a poor habit even on the day it would have been enough.</p>
+<h2 id="foothold">Foothold</h2>
+<p>The class is <a href="https://nvd.nist.gov/vuln/detail/CVE-2008-4250">MS08-067</a>: a flaw in the Server service&#x27;s path handling, reachable over SMB before any login. It was serious enough, and common enough, to be wormed in the Conficker era. The impact is code execution inside a service that runs as the operating system&#x27;s own account.</p>
+<p>Two facts about this bug are the lesson.</p>
+<p>The service pack and the language matter. The bulletin covers a family of targets, and a wrong guess is how an old host falls over rather than yielding a session. On a retired lab machine that is an inconvenience. Anywhere else it is the reason to confirm the scope before iterating.</p>
+<p>There is nothing to authenticate to. The missing patch is the whole precondition. On a supported Windows build with SMB still exposed, the note would be about exposure, signing, and relay. This is XP. The note is about a patch from 2008 that was never applied.</p>
+<h2 id="privilege-escalation">Privilege escalation</h2>
+<p>There is no second stage. The vulnerable code already runs as SYSTEM, so execution arrives at the top of the box. A bug in a program a person launched, and a bug in a service the machine launched, are different engagements even when the abstracts look similar. Read the privilege of the component before treating a foothold as understood.</p>
+<p>The two flag files live in the ordinary profile directories. Collecting them is housekeeping. It is not a technique, and the paths are not the thing to memorise.</p>
+<h2 id="lessons">Lessons</h2>
+<ul><li>Patch level can be the entire machine. The report sentence is short on purpose: the host runs an unsupported operating system and exposes an unpatched Server service (MS08-067), which allows unauthenticated code execution as SYSTEM. Blast radius is the rest of the paragraph, not a second exploit.</li><li>End of support, plus SMB on a reachable network, is a business finding even when no payload is sent. A reader who only hears the word SYSTEM has been taught the wrong lesson.</li><li>Do not collect a second issue to feel busy. Three ports, one of them the box: write that down and move on.</li><li>The drill is explaining, without notes, why this one has no privilege-escalation phase. &quot;The exploit is admin&quot; is not the explanation. The explanation is which process the bug runs in.</li></ul>
+  <nav class="turn" aria-label="Adjacent boxes"><a href="../lame/">Earlier · Lame</a><a class="later" href="../active/">Later · Active</a></nav>
+</article>
+</main>
+<footer class="site-foot">
+  <p>Retired boxes only. No live spoilers. MIT.</p>
+  <details class="captains-log">
+    <summary>Captain's log</summary>
+    <p>Stardate <time id="stardate">----.---</time>. Nothing on this shelf is still live. End of log.</p>
+  </details>
+</footer>
+</div>
+<script src="../../assets/site.js"></script>
+</body>
+</html>

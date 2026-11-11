@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Active — logbook</title>
+<meta name="description" content="A retired domain controller. Anonymous access to a replicated share, a leftover preference password, then an administrator who should not have been a service.">
+<meta name="theme-color" content="#e9e2d2">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<div class="wrap">
+<header class="mast">
+  <p class="brand"><a href="../../index.html">logbook</a></p>
+  <p class="brand-side"><a href="../../index.html">Index</a> · retired only</p>
+</header>
+<main id="content">
+<article class="writeup">
+  <p class="eyebrow">Example methodology note</p>
+  <h1>Active</h1>
+  <p class="meta"><span>Windows</span> <span aria-hidden="true">·</span> <span class="diff diff-easy">Easy</span> <span aria-hidden="true">·</span> <span>Released 28 Jul 2018</span> <span aria-hidden="true">·</span> <span>Retired 4 May 2024</span></p>
+  <ul class="techs"><li><a href="../../index.html?tag=enumeration">enumeration</a></li><li><a href="../../index.html?tag=smb">smb</a></li><li><a href="../../index.html?tag=gpp">gpp</a></li><li><a href="../../index.html?tag=kerberos">kerberos</a></li><li><a href="../../index.html?tag=active-directory">active-directory</a></li></ul>
+  <p class="lede">A retired domain controller. Anonymous access to a replicated share, a leftover preference password, then an administrator who should not have been a service.</p>
+  <nav class="contents" aria-label="Contents"><ol><li><a href="#recon">Recon</a></li><li><a href="#foothold">Foothold</a></li><li><a href="#privilege-escalation">Privilege escalation</a></li><li><a href="#lessons">Lessons</a></li></ol></nav>
+  <blockquote>
+<p><strong>Example methodology note.</strong> A study sketch of a long-retired machine, written for this shelf. It is original, it is not copied from a walkthrough, and it is not a reproduction guide. The class of issue and the impact are named. The bytes that would carry an attack out are not, and neither are the passwords.</p>
+</blockquote>
+<h2 id="recon">Recon</h2>
+<p>The port list is a domain controller&#x27;s. Kerberos, LDAP, SMB, and the management ports that come with them. There may not be a CVE at the end of this. Write the domain name down anyway. Here it is a single lab domain, and this host is the controller, so there is no second machine to pin the notes on by mistake.</p>
+<p>Share enumeration is the recon that matters. Most of the shares behave like a domain controller. One of them, the replication share, can be listed with no credential at all. A policy share that an anonymous session can read is already a finding. Open it before going looking for an exploit. Domain controllers leak through files far more often than they leak through memory corruption.</p>
+<h2 id="foothold">Foothold</h2>
+<p>Inside the replicated policy data is a Group Policy Preferences file of the old kind: a groups preference carrying a <code>cpassword</code>, tied to a domain service account. Microsoft encrypted those values with a key they then published, which is a long way of saying the field was never a secret. The tools stopped writing new ones in <a href="https://learn.microsoft.com/en-us/security-updates/securitybulletins/2014/ms14-025">MS14-025</a>. Files already sitting in SYSVOL were not removed by the bulletin. Anyone who can read the share can recover the password. The pattern is <a href="https://attack.mitre.org/techniques/T1552/006/">T1552.006</a>.</p>
+<p>On this host the share does not even ask for a domain login. The impact is a domain credential for a service account, available to anyone on the segment.</p>
+<p>The method, at the altitude these notes keep, is: find the preference file, treat <code>cpassword</code> as reversible, and then use the account only to see what that account can see. What it can see first is the user-level material, over SMB. That is the foothold. An identity, not a party trick.</p>
+<h2 id="privilege-escalation">Privilege escalation</h2>
+<p>Ask the directory what that identity is allowed to ask for. A service principal name is supposed to sit on a dull service account with a long random password. Here a domain administrator has one. Any authenticated user can request a service ticket for it, and the ticket is encrypted under that account&#x27;s key. Guessing the key offline is <a href="https://attack.mitre.org/techniques/T1558/003/">Kerberoasting</a> (T1558.003). The password on the far side is a human one, and a weak one, so it does not survive an ordinary wordlist. The result is domain administrator on the controller.</p>
+<p>None of this is a current software defect. It is four configuration mistakes, stacked:</p>
+<ol><li>Anonymous read on the replicated policies.</li><li>A Group Policy Preferences password left behind after the feature was deprecated.</li><li>A service principal name on a tier-zero account.</li><li>A password a wordlist can beat.</li></ol>
+<p>Any one of them is a finding on its own. The box is what you get when nobody closed the previous one.</p>
+<h2 id="lessons">Lessons</h2>
+<ul><li>SYSVOL is a file share. Read it like one, including the copy with &quot;replication&quot; in the name.</li><li>In the report, do not say the preference password was cracked. It was disclosed. The key was public. Guessing is a different finding, and it belongs to the administrator account: password quality, plus a service principal name that account should not have had.</li><li>Lead with the service principal name on the privileged account. That is the change a reader can raise as a ticket. The anonymous share is what made the chain reachable with no user at all.</li><li>The drill is one page, from memory: four mistakes, and the control that stops each link. If <code>cpassword</code> has to be looked up, this box is not known yet.</li></ul>
+  <nav class="turn" aria-label="Adjacent boxes"><a href="../legacy/">Earlier · Legacy</a></nav>
+</article>
+</main>
+<footer class="site-foot">
+  <p>Retired boxes only. No live spoilers. MIT.</p>
+  <details class="captains-log">
+    <summary>Captain's log</summary>
+    <p>Stardate <time id="stardate">----.---</time>. Nothing on this shelf is still live. End of log.</p>
+  </details>
+</footer>
+</div>
+<script src="../../assets/site.js"></script>
+</body>
+</html>

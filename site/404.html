@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Not in the log — logbook</title>
+<meta name="description" content="This page is not a retired box.">
+<meta name="theme-color" content="#e9e2d2">
+<style>
+  body { margin: 0; background: #e9e2d2; color: #1c1915; font-family: Georgia, "Noto Serif", serif; }
+  a { color: #234037; }
+</style>
+<script>
+(function () {
+  var top = {assets:1, boxes:1, "index.html":1, "index.json":1, "404.html":1, "favicon.svg":1};
+  var root = "/";
+  if (location.protocol !== "file:" && location.hostname.endsWith("github.io")) {
+    var seg = location.pathname.split("/").filter(Boolean)[0];
+    if (seg && !top[seg]) root = "/" + seg + "/";
+  }
+  function add(rel, href) {
+    var node = document.createElement("link");
+    node.rel = rel;
+    node.href = root + href;
+    if (rel === "icon") node.type = "image/svg+xml";
+    document.head.appendChild(node);
+  }
+  add("icon", "favicon.svg");
+  add("stylesheet", "assets/style.css");
+  document.addEventListener("DOMContentLoaded", function () {
+    var home = document.getElementById("home");
+    if (home) home.href = root;
+    var script = document.createElement("script");
+    script.src = root + "assets/site.js";
+    document.body.appendChild(script);
+  });
+})();
+</script>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<div class="wrap">
+<header class="mast">
+  <p class="brand"><a id="home" href="/">logbook</a></p>
+  <p class="brand-side">Retired boxes only</p>
+</header>
+<main id="content">
+<div class="page-404">
+  <h1>404</h1>
+  <p class="lede">This page is not in the log.</p>
+  <p>It may have been a typo. It may have been a live machine, in which case the omission is the point. The retired ones are on the index, which is still where it was.</p>
+</div>
+</main>
+<footer class="site-foot">
+  <p>Retired boxes only. No live spoilers. MIT.</p>
+  <details class="captains-log">
+    <summary>Captain's log</summary>
+    <p>Stardate <time id="stardate">----.---</time>. We appear to be lost. The shelf, however, is not. End of log.</p>
+  </details>
+</footer>
+</div>
+</body>
+</html>

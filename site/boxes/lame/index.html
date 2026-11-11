@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lame — logbook</title>
+<meta name="description" content="The first machine on the platform, long retired. Several old services answer at once. The work is telling a real door from a banner.">
+<meta name="theme-color" content="#e9e2d2">
+<link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<div class="wrap">
+<header class="mast">
+  <p class="brand"><a href="../../index.html">logbook</a></p>
+  <p class="brand-side"><a href="../../index.html">Index</a> · retired only</p>
+</header>
+<main id="content">
+<article class="writeup">
+  <p class="eyebrow">Example methodology note</p>
+  <h1>Lame</h1>
+  <p class="meta"><span>Linux</span> <span aria-hidden="true">·</span> <span class="diff diff-easy">Easy</span> <span aria-hidden="true">·</span> <span>Released 14 Mar 2017</span> <span aria-hidden="true">·</span> <span>Retired 26 May 2017</span></p>
+  <ul class="techs"><li><a href="../../index.html?tag=enumeration">enumeration</a></li><li><a href="../../index.html?tag=service-version">service-version</a></li><li><a href="../../index.html?tag=smb">smb</a></li><li><a href="../../index.html?tag=ftp">ftp</a></li></ul>
+  <p class="lede">The first machine on the platform, long retired. Several old services answer at once. The work is telling a real door from a banner.</p>
+  <nav class="contents" aria-label="Contents"><ol><li><a href="#recon">Recon</a></li><li><a href="#foothold">Foothold</a></li><li><a href="#privilege-escalation">Privilege escalation</a></li><li><a href="#lessons">Lessons</a></li></ol></nav>
+  <blockquote>
+<p><strong>Example methodology note.</strong> A study sketch of a long-retired machine, written for this shelf. It is original, it is not copied from a walkthrough, and it is not a reproduction guide. The class of issue and the impact are named. The bytes that would carry an attack out are not.</p>
+</blockquote>
+<h2 id="recon">Recon</h2>
+<p>Treat a host this old as a pile of hypotheses, not as a shopping list of modules. A version scan has to include the high ports: one of the services worth a line is not sitting in the first thousand.</p>
+<table><thead><tr><th>Service</th><th>Why it earns a line</th><th>Working theory</th></tr></thead><tbody><tr><td>FTP</td><td>Banner matches a build with a <a href="https://nvd.nist.gov/vuln/detail/CVE-2011-2523">public backdoor</a></td><td>The version may be a costume. The behaviour has to actually be there</td></tr><tr><td>SSH</td><td>OpenSSH from an Ubuntu of that era</td><td>A version anchor. Not, by itself, a way in</td></tr><tr><td>SMB</td><td>Samba 3.0.20, inside <a href="https://nvd.nist.gov/vuln/detail/CVE-2007-2447">CVE-2007-2447</a></td><td>Username-map handling can become command execution, if that feature is on. Impact is the privilege of the daemon</td></tr><tr><td>distcc</td><td>Compiler daemon on a high port, <a href="https://nvd.nist.gov/vuln/detail/CVE-2004-2687">CVE-2004-2687</a></td><td>Command execution as whichever account the daemon uses. A different question from the Samba one</td></tr></tbody></table>
+<p>Write the hostname and the workgroup down. They confirm the notes belong to this box, and they stop the next machine inheriting them.</p>
+<h2 id="foothold">Foothold</h2>
+<p>The FTP theory dies, and that is the useful part. The version matches a backdoor known in the wild. On this retired image the behaviour is not there. A matching banner is a lead. It becomes a finding only when the behaviour is confirmed.</p>
+<p>The Samba theory holds. <a href="https://nvd.nist.gov/vuln/detail/CVE-2007-2447">CVE-2007-2447</a> is command execution through the username map script, on builds where that feature is switched on. The daemon here is privileged, so the impact is code execution as root, with no local account in between. The decision worth keeping is the pairing: version, feature, privilege of the process. The advisory carries the detail.</p>
+<p>The compiler service stays on the list as a second door of the same age. One confirmed path is enough to finish the box. The other remains a labelled hypothesis, so the next odd high port is not a surprise. Even if that advisory applies, the account the daemon runs as is its own fact. It is not automatically the Samba result.</p>
+<h2 id="privilege-escalation">Privilege escalation</h2>
+<p>Look at the identity before going hunting for a kernel. The SMB daemon is running with enough privilege that the foothold and the top of the box are the same event. That is a finding about the service account. It is not a phase that was skipped.</p>
+<p>Had the identity been an ordinary user, this section would be sudo rules, SUID binaries, scheduled tasks, credentials left on disk. The absence of that list is a result. It belongs in the note in one line, so the gap does not look like a forgotten section.</p>
+<h2 id="lessons">Lessons</h2>
+<ul><li>Banners propose. They do not convict. The FTP version is the example to keep, because it looks worse than the issue that held.</li><li>When several services are old, pick the one you can explain. Leave the others labelled as hypotheses.</li><li>The first question after code execution is which user you landed as. Privilege is a property of the process, and you observe it.</li><li>Report sentence: an outdated Samba service exposed a known command-injection flaw in username handling and was running with administrative privilege, so the single issue was full compromise. Then exposure. Then the fix, which is to patch, not to run that map script, and not to run the daemon as root.</li></ul>
+<p>The drill is the hypothesis table, written before a search box is opened. Version, feature, privilege of the process, and what would disprove it.</p>
+  <nav class="turn" aria-label="Adjacent boxes"><a class="later" href="../legacy/">Later · Legacy</a></nav>
+</article>
+</main>
+<footer class="site-foot">
+  <p>Retired boxes only. No live spoilers. MIT.</p>
+  <details class="captains-log">
+    <summary>Captain's log</summary>
+    <p>Stardate <time id="stardate">----.---</time>. Nothing on this shelf is still live. End of log.</p>
+  </details>
+</footer>
+</div>
+<script src="../../assets/site.js"></script>
+</body>
+</html>
